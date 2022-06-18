@@ -1,35 +1,46 @@
 using System;
 using UnityEngine;
-using UnityRandom = UnityEngine.Random;
 
 public sealed class Bot : MonoBehaviour, IDamageable
 {
-    public int Health
+    public SpriteRenderer SpriteRenderer => _spriteRenderer;
+
+    public float LocalScale
     {
-        get => _healthInternalValue;
+        get => _localScale;
         set
         {
-            int oldHealth = _healthInternalValue;
-            _healthInternalValue = value;
+            _localScale = value;
+            transform.localScale = Vector3.one * _localScale;
+        }
+    }
+
+    public int Health
+    {
+        get => _health;
+        set
+        {
+            int oldHealth = _health;
+            _health = value;
             OnHealthChanged?.Invoke(oldHealth, value);
         }
     }
 
     public event Action<int, int> OnHealthChanged;
 
-    [SerializeField] private float _bodyMinimumLocalScale;
-    [SerializeField] private float _bodyMaximumLocalScale;
+    [SerializeField] private SpriteRenderer _spriteRenderer;
 
     [Space]
     [SerializeField] private float _motionVelocityMagnitude = 2.5f;
 
     [Space]
-    [SerializeField] private int _initialHealth = 100;
+    [SerializeField] private int _startHealth = 100;
 
-    private Rigidbody2D _rigidbody2D;
     private FunButton _funButton;
+    private Rigidbody2D _rigidbody2D;
 
-    private int _healthInternalValue;
+    private float _localScale;
+    private int _health;
 
     private void Awake()
     {
@@ -43,38 +54,31 @@ public sealed class Bot : MonoBehaviour, IDamageable
             _funButton = GameObject.FindObjectOfType<FunButton>();
         }
 
+        float calculatedHealth = LocalScale * _startHealth;
+        Health = (int)(calculatedHealth);
+
         this.OnHealthChanged += Bot_OnHealthChanged;
-
-        float bodyLocalScale = UnityRandom.Range(_bodyMinimumLocalScale, _bodyMaximumLocalScale);
-        transform.localScale = Vector3.one * bodyLocalScale;
-
-        Health = (int)(_initialHealth * bodyLocalScale);
-    }
-
-    private void Update()
-    {
-        transform.rotation = Quaternion.FromToRotation(Vector2.right, _funButton.transform.position - transform.position);
     }
 
     private void FixedUpdate()
     {
-        _rigidbody2D.velocity = transform.rotation * Vector2.right * _motionVelocityMagnitude;
+        Quaternion rotation = Quaternion.FromToRotation(Vector2.right, _funButton.transform.position - transform.position);
+        _rigidbody2D.velocity = rotation * Vector2.right * _motionVelocityMagnitude;
     }
 
     public void ApplyDamage(int damage)
     {
-        if (isActiveAndEnabled)
-        {
-            Health -= damage;
-        }
+        Health -= damage;
     }
 
     private void Bot_OnHealthChanged(int oldHealth, int newHealth)
     {
-        if (newHealth <= 0)
-        {
-            GameObject.Destroy(gameObject);
-        }
+        gameObject.SetActive(newHealth > 0);
+    }
+
+    private void OnDisable()
+    {
+        GameObject.Destroy(gameObject);
     }
 
     private void OnDestroy()

@@ -2,15 +2,22 @@ using UnityEngine;
 
 public sealed class Bullet : MonoBehaviour
 {
-    public int Damage
+    public float LocalScale
     {
-        get => _damageInternalValue;
-        set => _damageInternalValue = value;
+        get => _localScale;
+        set
+        {
+            _localScale = value;
+            transform.localScale = Vector3.one * _localScale;
+        }
     }
 
     [SerializeField] private float _lifeTime = 20;
 
-    private int _damageInternalValue;
+    [Space]
+    [SerializeField] private int _damage = 100;
+
+    private float _localScale;
 
     private void Start()
     {
@@ -19,10 +26,12 @@ public sealed class Bullet : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.TryGetComponent(out IDamageable damageable))
+        if (collision.gameObject.TryGetComponent(out IDamageable damageable))
         {
-            damageable.ApplyDamage(Damage);
-            GameObject.Destroy(gameObject);
+            float calculatedDamage = LocalScale * _damage;
+            damageable.ApplyDamage((int)calculatedDamage);
         }
+
+        GameObject.Destroy(gameObject);
     }
 }

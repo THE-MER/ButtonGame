@@ -4,7 +4,11 @@ public sealed class GameCamera : MonoBehaviour
 {
     public static GameCamera Linkage { get; private set; }
 
+    public static Camera Camera => Linkage._camera;
+
     public static FunButton FunButton { get; private set; }
+
+    [SerializeField] private Camera _camera;
 
     private void Awake()
     {
@@ -21,6 +25,6 @@ public sealed class GameCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        transform.position = new Vector3(FunButton.transform.position.x, FunButton.transform.position.y, transform.position.z);
+        transform.position = FunButton.transform.position;
     }
 }

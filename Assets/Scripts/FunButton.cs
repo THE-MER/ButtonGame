@@ -4,7 +4,7 @@ using UnityEngine;
 public sealed class FunButton : MonoBehaviour
 {
     public KeyCode ButtonKeyCode => _buttonKeyCode;
-    public Rigidbody2D Rigidbody2D => _rigidbody2D;
+    public SpriteRenderer SpriteRenderer => _spriteRenderer;
 
     public event Action<FunButton> OnButtonDown;
     public event Action<FunButton> OnButtonPressed;
@@ -13,16 +13,17 @@ public sealed class FunButton : MonoBehaviour
     [SerializeField] private KeyCode _buttonKeyCode;
 
     [Space]
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+
+    [Space]
     [SerializeField] private Sprite _buttonDownSprite;
     [SerializeField] private Sprite _buttonPressedSprite;
     [SerializeField] private Sprite _buttonUpSprite;
 
-    private SpriteRenderer _spriteRenderer;
     private Rigidbody2D _rigidbody2D;
 
     private void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
     }
 

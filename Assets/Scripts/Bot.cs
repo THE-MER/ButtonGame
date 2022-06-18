@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
+using UnityRandom = UnityEngine.Random;
 
+[RequireComponent(typeof(AudioSource))]
 public sealed class Bot : MonoBehaviour, IDamageable
 {
     public SpriteRenderer SpriteRenderer => _spriteRenderer;
@@ -36,8 +38,13 @@ public sealed class Bot : MonoBehaviour, IDamageable
     [Space]
     [SerializeField] private int _startHealth = 100;
 
+    [Space]
+    [SerializeField] private Piece[] _piecePrefabs;
+    [SerializeField] private AudioClip[] _destroyAudioClips;
+
     private FunButton _funButton;
     private Rigidbody2D _rigidbody2D;
+    private AudioSource _audioSource;
 
     private float _localScale;
     private int _health;
@@ -45,6 +52,7 @@ public sealed class Bot : MonoBehaviour, IDamageable
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
+        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -78,6 +86,14 @@ public sealed class Bot : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        for (int index = 0; index < _piecePrefabs.Length; index++)
+        {
+            Piece piece = Instantiate(_piecePrefabs[index], transform.position, transform.rotation);
+            piece.LocalScale = LocalScale;
+        }
+
+        _audioSource.PlayOneShot(_destroyAudioClips[UnityRandom.Range(0, _destroyAudioClips.Length)]);
+
         GameObject.Destroy(gameObject);
     }
 

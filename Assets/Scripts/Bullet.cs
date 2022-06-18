@@ -2,6 +2,8 @@ using UnityEngine;
 
 public sealed class Bullet : MonoBehaviour
 {
+    public SpriteRenderer SpriteRenderer => _spriteRenderer;
+
     public float LocalScale
     {
         get => _localScale;
@@ -12,6 +14,9 @@ public sealed class Bullet : MonoBehaviour
         }
     }
 
+    [SerializeField] private SpriteRenderer _spriteRenderer;
+
+    [Space]
     [SerializeField] private float _lifeTime = 20;
 
     [Space]

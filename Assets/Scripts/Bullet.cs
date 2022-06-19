@@ -22,6 +22,9 @@ public sealed class Bullet : MonoBehaviour
     [Space]
     [SerializeField] private int _damage = 100;
 
+    [Space]
+    [SerializeField] private BulletBlast _bulletBlast;
+
     private float _localScale;
 
     private void Start()
@@ -38,5 +41,14 @@ public sealed class Bullet : MonoBehaviour
         }
 
         GameObject.Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        if(_bulletBlast != null)
+        {
+            BulletBlast bulletBlast = Instantiate(_bulletBlast, transform.position, transform.rotation);
+            bulletBlast.LocalScale = LocalScale;
+        }
     }
 }

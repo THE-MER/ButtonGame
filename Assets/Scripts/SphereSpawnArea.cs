@@ -1,11 +1,11 @@
 using UnityEngine;
 using UnityRandom = UnityEngine.Random;
 
-public sealed class SpawnArea : MonoBehaviour
+public sealed class SphereSpawnArea : MonoBehaviour
 {
     public Vector3 GetSpawnPosition()
     {
-        Vector3 point = new Vector3(UnityRandom.Range(-0.5f, 0.5f), UnityRandom.Range(-0.5f, 0.5f), UnityRandom.Range(-0.5f, 0.5f));
+        Vector3 point = UnityRandom.insideUnitSphere;
         return transform.TransformPoint(point);
     }
 
@@ -18,6 +18,6 @@ public sealed class SpawnArea : MonoBehaviour
     {
         Gizmos.color = Color.cyan;
         Gizmos.matrix = transform.localToWorldMatrix;
-        Gizmos.DrawWireCube(Vector3.zero, Vector3.one);
+        Gizmos.DrawWireSphere(Vector3.zero, 1.0f);
     }
 }

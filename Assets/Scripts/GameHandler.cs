@@ -19,7 +19,7 @@ public class GameHandler : MonoBehaviour
         }
     }
 
-    [SerializeField] private SpawnArea _spawnArea;
+    [SerializeField] private BoxSpawnArea _spawnArea;
 
     [Space]
     [SerializeField] private Bot _botPrefab;

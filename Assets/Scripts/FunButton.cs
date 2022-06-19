@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using UnityRandom = UnityEngine.Random;
 
+[RequireComponent(typeof(AudioSource))]
 public sealed class FunButton : MonoBehaviour
 {
     public KeyCode ButtonKeyCode => _buttonKeyCode;
@@ -24,6 +25,20 @@ public sealed class FunButton : MonoBehaviour
     [Space]
     [SerializeField] private int _minimumNumberOfScorePerPress = 10;
     [SerializeField] private int _maximumNumberOfScorePerPress = 50;
+
+    [Space]
+    [SerializeField] private AudioClip[] _pressedAudioClips;
+
+    [Space]
+    [SerializeField] private ScoreParticle _scoreParticlePrefab;
+    [SerializeField] private SphereSpawnArea _scoreSphereSpawnArea;
+
+    private AudioSource _audioSource;
+
+    private void Awake()
+    {
+        _audioSource = GetComponent<AudioSource>();
+    }
 
     private void Start()
     {
@@ -64,9 +79,19 @@ public sealed class FunButton : MonoBehaviour
     {
         _spriteRenderer.sprite = _buttonUpSprite;
 
+        _audioSource.PlayOneShot(_pressedAudioClips[UnityRandom.Range(0, _pressedAudioClips.Length)]);
+
         if (GameHandler.Linkage != null)
         {
-            GameHandler.Score += UnityRandom.Range(_minimumNumberOfScorePerPress, _maximumNumberOfScorePerPress);
+            int score = UnityRandom.Range(_minimumNumberOfScorePerPress, _maximumNumberOfScorePerPress);
+
+            if(_scoreParticlePrefab != null)
+            {
+                ScoreParticle scoreParticle = Instantiate(_scoreParticlePrefab, _scoreSphereSpawnArea.GetSpawnPosition(), _scoreSphereSpawnArea.GetSpawnRotation());
+                scoreParticle.ScoreTextMesh.text = $"+{score}";
+            }
+
+            GameHandler.Score += score;
         }
     }
 

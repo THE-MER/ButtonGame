@@ -2,7 +2,6 @@ using System;
 using UnityEngine;
 using UnityRandom = UnityEngine.Random;
 
-[RequireComponent(typeof(AudioSource))]
 public sealed class Bot : MonoBehaviour, IDamageable
 {
     public SpriteRenderer SpriteRenderer => _spriteRenderer;
@@ -40,15 +39,18 @@ public sealed class Bot : MonoBehaviour, IDamageable
 
     [Space]
     [SerializeField] private Piece[] _piecePrefabs;
-    [SerializeField] private AudioClip[] _destroyAudioClips;
+    [SerializeField] private float _pieceVelocityMagnitude = 2.5f;
 
     [Space]
     [SerializeField] private int _minimumNumberOfScorePerKill = 150;
     [SerializeField] private int _maximumNumberOfScorePerKill = 500;
 
+    [Space]
+    [SerializeField] private ScoreParticle _scoreParticlePrefab;
+    [SerializeField] private SphereSpawnArea _scoreSphereSpawnArea;
+
     private FunButton _funButton;
     private Rigidbody2D _rigidbody2D;
-    private AudioSource _audioSource;
 
     private float _localScale;
     private int _health;
@@ -56,7 +58,6 @@ public sealed class Bot : MonoBehaviour, IDamageable
     private void Awake()
     {
         _rigidbody2D = GetComponent<Rigidbody2D>();
-        _audioSource = GetComponent<AudioSource>();
     }
 
     private void Start()
@@ -90,25 +91,35 @@ public sealed class Bot : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
-        if (this == null)
-        {
-            return;
-        }
-
         for (int index = 0; index < _piecePrefabs.Length; index++)
         {
             Piece piece = Instantiate(_piecePrefabs[index], transform.position, transform.rotation);
             piece.LocalScale = LocalScale;
+
+            if (piece.TryGetComponent(out Rigidbody2D pieceRigidbody2D))
+            {
+                float rangeX = UnityRandom.Range(-1.0f, 1.0f);
+                float rangeY = UnityRandom.Range(-1.0f, 1.0f);
+
+                Vector2 pieceVelocity = new Vector2(rangeX, rangeY).normalized * _pieceVelocityMagnitude;
+                pieceRigidbody2D.AddForce(pieceVelocity * pieceRigidbody2D.mass, ForceMode2D.Impulse);
+            }
         }
-
-        _audioSource.PlayOneShot(_destroyAudioClips[UnityRandom.Range(0, _destroyAudioClips.Length)]);
-
-        GameObject.Destroy(gameObject);
 
         if (GameHandler.Linkage != null)
         {
-            GameHandler.Score += UnityRandom.Range(_minimumNumberOfScorePerKill, _maximumNumberOfScorePerKill);
+            int score = UnityRandom.Range(_minimumNumberOfScorePerKill, _maximumNumberOfScorePerKill);
+
+            if (_scoreParticlePrefab != null)
+            {
+                ScoreParticle scoreParticle = Instantiate(_scoreParticlePrefab, _scoreSphereSpawnArea.GetSpawnPosition(), _scoreSphereSpawnArea.GetSpawnRotation());
+                scoreParticle.ScoreTextMesh.text = $"+{score}";
+            }
+
+            GameHandler.Score += score;
         }
+
+        GameObject.Destroy(gameObject);
     }
 
     private void OnDestroy()

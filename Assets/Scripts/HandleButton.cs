@@ -17,6 +17,14 @@ public sealed class HandleButton : MonoBehaviour
     [SerializeField] private Sprite _buttonUpSprite;
 
     [Space]
+    [SerializeField] private LineRenderer _lineRenderer;
+    [SerializeField] private float _lineRendererMinimumWidth = 0.0f;
+    [SerializeField] private float _lineRendererMaximumWidth = 0.5f;
+
+    [Space]
+    [SerializeField] private BulletPreview _bulletPreview;
+
+    [Space]
     [SerializeField] private Bullet _bulletPrefab;
 
     [Space]
@@ -75,6 +83,25 @@ public sealed class HandleButton : MonoBehaviour
         _spriteRenderer.sprite = _buttonUpSprite;
 
         Shoot();
+    }
+
+    private void Update()
+    {
+        if (_lineRenderer != null)
+        {
+            _lineRenderer.SetPosition(0, transform.position);
+            _lineRenderer.SetPosition(1, _funButton.transform.localPosition);
+
+            float width = KeyHoldingTime < 0.0f ? Mathf.Min(Mathf.Max(_lineRendererMinimumWidth, Time.time - _buttonDownTime), _lineRendererMaximumWidth) : 0.0f;
+            _lineRenderer.startWidth = width;
+            _lineRenderer.endWidth = width;
+        }
+
+        if(_bulletPreview != null)
+        {
+            float bulletLocalScale = KeyHoldingTime < 0.0f ? Mathf.Min(Mathf.Max(_bulletMinimumLocalScale, Time.time - _buttonDownTime), _bulletMaximumLocalScale) : 0.0f;
+            _bulletPreview.LocalScale = bulletLocalScale;
+        }
     }
 
     private void FixedUpdate()

@@ -90,6 +90,11 @@ public sealed class Bot : MonoBehaviour, IDamageable
 
     private void OnDisable()
     {
+        if (this == null)
+        {
+            return;
+        }
+
         for (int index = 0; index < _piecePrefabs.Length; index++)
         {
             Piece piece = Instantiate(_piecePrefabs[index], transform.position, transform.rotation);
@@ -100,7 +105,7 @@ public sealed class Bot : MonoBehaviour, IDamageable
 
         GameObject.Destroy(gameObject);
 
-        if(GameHandler.Linkage != null)
+        if (GameHandler.Linkage != null)
         {
             GameHandler.Score += UnityRandom.Range(_minimumNumberOfScorePerKill, _maximumNumberOfScorePerKill);
         }

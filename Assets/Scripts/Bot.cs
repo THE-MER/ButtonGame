@@ -42,6 +42,10 @@ public sealed class Bot : MonoBehaviour, IDamageable
     [SerializeField] private Piece[] _piecePrefabs;
     [SerializeField] private AudioClip[] _destroyAudioClips;
 
+    [Space]
+    [SerializeField] private int _minimumNumberOfScorePerKill = 150;
+    [SerializeField] private int _maximumNumberOfScorePerKill = 500;
+
     private FunButton _funButton;
     private Rigidbody2D _rigidbody2D;
     private AudioSource _audioSource;
@@ -95,6 +99,11 @@ public sealed class Bot : MonoBehaviour, IDamageable
         _audioSource.PlayOneShot(_destroyAudioClips[UnityRandom.Range(0, _destroyAudioClips.Length)]);
 
         GameObject.Destroy(gameObject);
+
+        if(GameHandler.Linkage != null)
+        {
+            GameHandler.Score += UnityRandom.Range(_minimumNumberOfScorePerKill, _maximumNumberOfScorePerKill);
+        }
     }
 
     private void OnDestroy()

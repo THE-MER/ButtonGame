@@ -31,9 +31,6 @@ public class Piece : MonoBehaviour
 
     private void Update()
     {
-        if (SpriteRenderer.color != _endColor)
-        {
-            SpriteRenderer.color = Color.Lerp(SpriteRenderer.color, _endColor, Time.deltaTime * 1 / _lifeTime);
-        }
+        SpriteRenderer.color = Color.Lerp(SpriteRenderer.color, _endColor, Time.deltaTime / _lifeTime);
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityRandom = UnityEngine.Random;
 
 public sealed class FunButton : MonoBehaviour
 {
@@ -20,12 +21,9 @@ public sealed class FunButton : MonoBehaviour
     [SerializeField] private Sprite _buttonPressedSprite;
     [SerializeField] private Sprite _buttonUpSprite;
 
-    private Rigidbody2D _rigidbody2D;
-
-    private void Awake()
-    {
-        _rigidbody2D = GetComponent<Rigidbody2D>();
-    }
+    [Space]
+    [SerializeField] private int _minimumNumberOfScorePerPress = 10;
+    [SerializeField] private int _maximumNumberOfScorePerPress = 50;
 
     private void Start()
     {
@@ -65,6 +63,11 @@ public sealed class FunButton : MonoBehaviour
     private void _funButton_OnButtonUp(FunButton funButton)
     {
         _spriteRenderer.sprite = _buttonUpSprite;
+
+        if (GameHandler.Linkage != null)
+        {
+            GameHandler.Score += UnityRandom.Range(_minimumNumberOfScorePerPress, _maximumNumberOfScorePerPress);
+        }
     }
 
     private void OnDestroy()
